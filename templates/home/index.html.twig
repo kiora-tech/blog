@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="post-preview">
+                <a href="{{ path('post') }}">
+                    <h2 class="post-title">
+                        Register your PHP code
+                    </h2>
+                    <h3 class="post-subtitle">
+                        Use packagist
+                    </h3>
+                </a>
+                <p class="post-meta">Posted by
+                    <a href="#">Rathgeber Stéphane</a>
+                    on April 4, 2020</p>
+            </div>
+            <hr>
+            <div class="post-preview">
+                <a href="{{ path('post') }}">
+                    <h2 class="post-title">
+                        Create your first Bundle
+                    </h2>
+                    <h3 class="post-subtitle">
+                        Do you want show how create a Symfony Bundle step by step?
+                    </h3>
+                </a>
+                <p class="post-meta">Posted by
+                    <a href="#">Rathgeber Stéphane</a>
+                    on March 27, 2020</p>
+            </div>
+            <hr>
+
+
+            <!-- Pager -->
+            <div class="clearfix">
+                <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
