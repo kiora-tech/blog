@@ -1,0 +1,187 @@
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <h2 class="section-heading">Why</h2>
+
+                A bundle is similar to a plugin in other software, but even better<br>
+
+                We have to create a bundle in two use cases:
+                <ul>
+                    <li>To share symfony code</li>
+                    <li>To encapsulate a library</li>
+                </ul>
+                You can see many examples to share code:
+
+                <ul>
+                    <li>symfony/maker-bundle</li>
+                    <li>symfony/framework-bundle</li>
+                </ul>
+
+                And to encapsulating a library:
+                <ul>
+                    <li>symfony/twig-bundle</li>
+                    <li>symfony/swiftmailer-bundle</li>
+                </ul>
+
+                <h2 class="section-heading">How</h2>
+                Create your bundle project
+                <pre><code>mkdir foo-bundle
+cd foo-bundle</code></pre>
+
+                Initialize your bundle
+                <pre><code>composer init
+composer req symfony/http-kernel
+git init</code></pre>
+
+                The only required file for a bundle is XXXBundle.php.<br>
+                This file will be loaded by the symfony kernel.<br>
+                By convention the bundle name is CompanyComposantBundle.php (cf: symfony bundle)<br>
+
+                <pre><code class="bash">touch KioraFooBunlde.php</code></pre>
+
+                Edit the file KioralFooBundle.php
+                <pre><code>&#x3C;?php
+namespace Kiora\FooBundle;
+
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class KioralFooBundle extends Bundle
+{
+}</code></pre>
+                Edit the file composer.json
+                <pre><code class="json">{
+    "name": "kiora/foo-bundle",
+    "description": "A bundle",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Kiora\\FooBundle\\": ""
+        }
+    },
+    "require": {
+        "symfony/http-kernel": "^4.3|^5.0",
+    }
+}</code></pre>
+                <p>
+                    Great , you just created your first minimal bundle. But a bundle must do something.
+                </p>
+                <p>
+                    Create a glue Bundle<br>
+                    Imagine that you have a custom library and you want to simplify its usage inside symfony projects.
+                </p>
+                <pre><code class="bash">composer req symfony/dependency-injection
+composer req symfony/config
+composer req your/library
+mkdir -p Resources/config
+mkdir DependencyInjection
+
+touch DependencyInjection/Configuration.php
+touch DependencyInjection/KioraFooExtension.php
+touch Resources/config/services.xml</code></pre>
+                <p>
+                    Yes, just three new files<br>
+
+                    The file Configuration.php defines the configuration tree for your bundle.<br>
+                    The file KioraFooExtension.php will load the DI configuration (services, parameters, ..) of your
+                    bundle.<br>
+                    The file services.xml defines the definitions of your services.<br>
+
+                    The extension file must by named like the bundle XXXBundle → XXXExtension to be loaded automatically
+                </p>
+
+                Edit the file Configuration.php
+                <pre><code>&#x3C;?php
+
+namespace Kiora\FooBundle\DependencyInjection;
+
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+class Configuration implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder('kiora_kiora');
+
+        $treeBuilder->getRootNode()
+            ->children()
+            ->scalarNode('username')
+            ->isRequired()
+            ->cannotBeEmpty()
+            ->end()
+            ->scalarNode('password')
+            ->isRequired()
+            ->cannotBeEmpty()
+            ->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}</code></pre>
+                Edit the file KioraFooExtension.php
+                <pre><code>&#x3C;?php
+
+namespace Kiora\FoolBundle\DependencyInjection;
+
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+class KioraFooExtension extends Extension
+{
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.xml');
+
+    $configuration = new Configuration();
+    $processor = new Processor();
+    $config = $processor->processConfiguration($configuration, $configs);
+
+    $container->setParameter('kiora.username', $config['username']);
+    $container->setParameter('kiora.password', $config['password']);
+
+    }
+}</code></pre>
+                Edit the file services.xml
+                <pre><code>&#x3C;?xml version=&#x22;1.0&#x22; ?&#x3E;
+    &#x3C;container xmlns=&#x22;http://symfony.com/schema/dic/services&#x22;
+               xmlns:xsi=&#x22;http://www.w3.org/2001/XMLSchema-instance&#x22;
+               xsi:schemaLocation=&#x22;http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd&#x22;&#x3E;
+        &#x3C;services&#x3E;
+            &#x3C;service id=&#x22;your.libraray&#x22; class=&#x22;Your\Library&#x22; public=&#x22;true&#x22;&#x3E;
+                &#x3C;argument&#x3E;%kiora.username%&#x3C;/argument&#x3E;
+                &#x3C;argument&#x3E;%kiora.password%&#x3C;/argument&#x3E;
+            &#x3C;/service&#x3E;
+            &#x3C;service id=&#x22;Your\Library&#x22; alias=&#x22;your.libraray&#x22; /&#x3E;
+        &#x3C;/services&#x3E;
+    &#x3C;/container&#x3E;</code></pre>
+
+                <h2 class="section-heading">Tips and tricks</h2>
+                <p>
+                    Start with an empty bundle, publish it and register it on <a href="https://packagist.org/"
+                                                                                 target="_blank">https://packagist.org/</a>
+                    (or other)<br>
+                    Before doing so, you can edit your bundle directly in the vendor folder. With this method you can
+                    test your bundle.<br>
+                    If you don't want to publish it before you finish, you can install it locally<br>
+                </p>
+                <pre><code class="json">//composer.json
+{
+//...
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "../foo-bundle"
+        }
+    ],
+//...
+}</code></pre>
+                <pre><code class="bash">composer req kiora/foo-bundle dev-master</code></pre>
+            </div>
+        </div>
+    </div>
+</article>

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PostController!{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet"
+          href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/default.min.css">
+
+{% endblock %}
+{% block javascripts %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
+
+{% block header %}
+
+    <header class="masthead" style="background-image: url('{{ asset('img/post-bg.jpg') }}')">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="post-heading">
+                        <h1>Create a Bundle</h1>
+                        <h2 class="subheading">A guid line to start your bundle</h2>
+                        <span class="meta">Posted by
+              <a href="https://github.com/james2001" target="_blank">Rathgeber Stéphan</a>
+              on March 27, 2020</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+{% endblock %}
+
+{% block body %}
+{% include 'posts/post' ~ id ~ '.html.twig' %}
+{% endblock %}
