@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet"
+          href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/default.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+
+    <div id="editor">
+    </div>
+    <button id="submit">test</button>
+    <div id="ops"></div>
+
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+
+        var quill = new Quill('#editor', {
+            modules: {
+                syntax: true,
+                toolbar: [
+                    ['bold', 'italic'],
+                    ['link', 'blockquote', 'code-block', 'image'],
+                    [{ list: 'ordered' }, { list: 'bullet' }]
+                ]
+            },
+            placeholder: 'Compose an epic...',
+            theme: 'snow'
+        });
+        quill.setContents([{"insert":"Hello World!\nSome  "},{"attributes":{"bold":true},"insert":"bold"},{"insert":" text\n\nsdfgsfg s\nsgfd g\n\n\nsdfg \n\noLOj, ,,iusdf ;k^sdf ,sùl;,df\n\n"}]
+        );
+
+        $('#submit').click(function () {
+            let node = document.createElement('article');
+            let quill2 = new Quill(node, {});
+            quill2.setContents(quill.getContents());
+
+
+            $("#ops").html( node.firstChild.innerHTML);
+
+            document.querySelectorAll('pre.ql-syntax').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+
+
+        });
+
+
+
+    </script>
+{% endblock %}
+
